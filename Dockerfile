@@ -14,7 +14,7 @@ LABEL Description="A container for hackathon starter" Vendor="NiXX" Version="1.0
 RUN yum -y update; yum clean all
 RUN yum -y group install "Development Tools"
 RUN yum -y install epel-release; yum clean all
-RUN yum -y install nginx git which inotify-tools
+RUN yum -y install git which inotify-tools
 
 
 RUN yum install -y nodejs npm
@@ -23,30 +23,23 @@ RUN yum install -y nodejs npm
 #RUN n 0.12
 RUN npm config set loglevel warn
 
-#RUN npm cache clean -f
 # Setup the Volume
 VOLUME ["/var/www"]
 
 RUN mkdir /var/internal
-
-#lsyncd -rsync /var/www /var/internal && \
 
 RUN echo "inotifywait -r -m /var/www | while read" >> inotify.sh
 RUN echo "do" >> inotify.sh
 RUN echo "rsync -a /var/www/ /var/internal/" >> inotify.sh
 RUN echo "done" >> inotify.sh
 
-# RUN nohup sh inotify.sh &
 # Expose Ports
 EXPOSE 3000
 
 # Let's go go go
 CMD sh inotify.sh & \
 sleep 3 && \
-echo "www DIRECTORY" && \
-ls /var/www && \
-touch /var/www/test.txt && \
-sleep 3 && \
+rsync -a /var/www/ /var/internal/ && \
 cd /var/internal && \
 npm install && \
 npm start
