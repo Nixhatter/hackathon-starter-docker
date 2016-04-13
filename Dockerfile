@@ -18,7 +18,7 @@ RUN yum -y install git which inotify-tools
 
 
 RUN yum install -y nodejs npm
-#RUN npm install -g npm@latest
+RUN npm install -g npm@latest
 #RUN npm install -g n
 #RUN n 0.12
 RUN npm config set loglevel warn
@@ -30,8 +30,10 @@ RUN mkdir /var/internal
 
 RUN echo "inotifywait -r -m /var/www | while read" >> inotify.sh
 RUN echo "do" >> inotify.sh
-RUN echo "rsync -a --exclude=node_modules --delete /var/www/ /var/internal/" >> inotify.sh
+RUN echo "rsync -a /var/www/ /var/internal/" >> inotify.sh
 RUN echo "done" >> inotify.sh
+
+RUN npm cache clean
 
 # Expose Ports
 EXPOSE 3000
@@ -39,7 +41,7 @@ EXPOSE 3000
 # Let's go go go
 CMD sh inotify.sh & \
 sleep 3 && \
-rsync -a /var/www/ /var/internal/ && \
+rsync -a --exclude=node_modules --delete /var/www/ /var/internal/ && \
 cd /var/internal && \
 npm install && \
 npm start
