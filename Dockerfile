@@ -19,7 +19,7 @@ RUN yum -y install git which inotify-tools
 
 RUN yum install -y nodejs npm
 RUN npm install -g npm@latest
-#RUN npm install -g n
+RUN npm install -g n
 RUN n stable
 RUN npm config set loglevel warn
 
